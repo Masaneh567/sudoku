@@ -28,7 +28,7 @@ def row_remover(sudoku):
         for x in range(9):
             if is_list(row[x]):
                 for y in range(9):
-                    if not is_list(row[y]):
+                    if not is_list(row[y]) and row[y] in row[x]:
                         row[x].remove(row[y])
     return sudoku
 
@@ -53,4 +53,13 @@ def list_to_int(sudoku):
                 row[x] = row[x][0]
     return sudoku
 
-print(list_to_int(column_remover(row_remover(convert_to_listed(puzzle)))))
+first_round = list_to_int(column_remover(row_remover(convert_to_listed(puzzle))))
+print(first_round)
+second_round = list_to_int(column_remover(row_remover(first_round)))
+print(second_round)
+third_round = list_to_int(column_remover(row_remover(second_round)))
+print(third_round)
+fourth_round = list_to_int(column_remover(row_remover(third_round)))
+print(fourth_round)
+fifth_round = list_to_int(column_remover(row_remover(fourth_round)))
+print(fifth_round)
