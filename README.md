@@ -65,18 +65,4 @@ def list_to_int(sudoku):
                 row[x] = row[x][0]
     return sudoku
 
-#Will run this in probably a while loop, but this solves the sudoku given at the top
-'''
-first_round = list_to_int(remove_by_grid(column_remover(row_remover(convert_to_listed(puzzle)))))
-print(first_round)
-second_round = list_to_int(remove_by_grid(column_remover(row_remover(first_round))))
-print(second_round)
-third_round = list_to_int(remove_by_grid(column_remover(row_remover(second_round))))
-print(third_round)
-fourth_round = list_to_int(remove_by_grid(column_remover(row_remover(third_round))))
-print(fourth_round)
-fifth_round = list_to_int(remove_by_grid(column_remover(row_remover(fourth_round))))
-print(fifth_round)
-sixth_round = list_to_int(remove_by_grid(column_remover(row_remover(fifth_round))))
-print(sixth_round)
-'''
+
