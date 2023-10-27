@@ -1,4 +1,5 @@
-#An easy level sudoku from the sudoku app
+#An easy level sudoku from the sudoku app 
+#example comment 
 puzzle = [[6, 5, 0, 0, 0, 3, 2, 4, 7],
           [4, 0, 0, 0, 0, 7, 0, 0, 0],
           [9, 0, 7, 2, 5, 0, 0, 0, 3],
