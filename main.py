@@ -1,5 +1,3 @@
-#An easy level sudoku from the sudoku app 
-#example comment 
 puzzle = [[6, 5, 0, 0, 0, 3, 2, 4, 7],
           [4, 0, 0, 0, 0, 7, 0, 0, 0],
           [9, 0, 7, 2, 5, 0, 0, 0, 3],
@@ -10,63 +8,66 @@ puzzle = [[6, 5, 0, 0, 0, 3, 2, 4, 7],
           [3, 7, 4, 0, 0, 0, 9, 0, 0],
           [1, 0, 9, 0, 0, 0, 0, 0, 4]]
 
-#Function to replace zeros (numbers to be solved) with a list 1-9 for what numbers it could be
+# For variable names: row = row, cols = column, cols2 or row2 is just a second index to go through them,
+# rrow and rcols are just the reset to the top left version for searching by grid
+
+# Function to replace zeros (numbers to be solved) with a list 1-9 for what numbers it could be
 def convert_to_listed(puzzle):
     for row in puzzle:
-        for num in range(9):
-            if row[num] == 0:
-                row[num] = list(range(1,10))
+        for cols in range(9):
+            if row[cols] == 0:
+                row[cols] = list(range(1,10))
     return puzzle
 
-#Just a function I used to help other functions
 def is_list(x):
-    if type(x) is list:
-        return True
-    else:
-        return False
+    return type(x) == list
 
-#remove by row function
+# remove by row function
+# rowcols is to look for list of potentials, rowcols2 is the numbers already given/solved in the sudoku to remove from
+# list of potentials
 def row_remover(sudoku):
     for row in sudoku:
-        for x in range(9):
-            if is_list(row[x]):
-                for y in range(9):
-                    if not is_list(row[y]) and row[y] in row[x]:
-                        row[x].remove(row[y])
+        for cols in range(9):
+            if is_list(row[cols]):
+                for cols2 in range(9):
+                    if not is_list(row[cols2]) and row[cols2] in row[cols]:
+                        row[cols].remove(row[cols2])
     return sudoku
 
-#remove by column function
+# remove by column function
+# rowcols is to look for list of potentials, row2cols is the numbers already given/solved in the sudoku to remove from
+# list of potentials
 def column_remover(sudoku):
     for row in sudoku:
-        for x in range(9):
-            if is_list(row[x]):
-                for y in range(9):
-                    if not is_list(sudoku[y][x]) and sudoku[y][x] in row[x]:
-                        row[x].remove(sudoku[y][x])
+        for cols in range(9):
+            if is_list(row[cols]):
+                for row2 in range(9):
+                    if not is_list(sudoku[row2][cols]) and sudoku[row2][cols] in row[cols]:
+                        row[cols].remove(sudoku[row2][cols])
     return sudoku
 
-#remove by grid function
+# remove by grid function
+# rowcols is to look for list of potentials, n is the column index and m is the box index to check each square for
+# numbers already given/solved to remove from list of potentials
 def remove_by_grid(sudoku):
-    for y in range(9):
-        for x in range(9):
-            if is_list(sudoku[y][x]):
-                r = (x // 3) * 3
-                p = (y // 3) * 3
-                for n in range(r, r+3):
-                    for m in range(p, p+3):
-                        if not is_list(sudoku[m][n]) and sudoku[m][n] in sudoku[y][x]:
-                            sudoku[y][x].remove(sudoku[m][n])
+    for row in range(9):
+        for cols in range(9):
+            if is_list(sudoku[row][cols]):
+                rcols = (cols // 3) * 3
+                rrow = (row // 3) * 3
+                for n in range(rcols, rcols+3):
+                    for m in range(rrow, rrow+3):
+                        if not is_list(sudoku[m][n]) and sudoku[m][n] in sudoku[row][cols]:
+                            sudoku[row][cols].remove(sudoku[m][n])
     return sudoku
 
-#convert one letter lists to just integers
+# convert one letter lists to just integers
 def list_to_int(sudoku):
     for row in sudoku:
-        for x in range(9):
-            if is_list(row[x]) and len(row[x]) == 1:
-                row[x] = row[x][0]
+        for cols in range(9):
+            if is_list(row[cols]) and len(row[cols]) == 1:
+                row[cols] = row[cols][0]
     return sudoku
-
-#Will run this in probably a while loop, but this solves the sudoku given at the top
 '''
 first_round = list_to_int(remove_by_grid(column_remover(row_remover(convert_to_listed(puzzle)))))
 print(first_round)
