@@ -162,11 +162,28 @@ def naked_pairs_rows(sudoku):
                                     col.remove(x)
    
     return list_to_int(sudokucopy)   
-  
+
+
+
+
+
 first = test_1(puzzle) 
 print(naked_pairs_rows(first))
 
+def column_to_row(list_of_lists):
+    unlisted = []
+    # a list of all the entries in row order unlisted
+    for row in range(len(list_of_lists)): 
+        for col in range(len(list_of_lists)):
+                unlisted.append(list_of_lists[col][row])
+    relisted = []
+    # putting entries into 9 lists of 9
+    for i in range(0, len(unlisted), 9):
+        relisted.append(unlisted[i:i+9])
+    return relisted
 
+def naked_pairs_cols(sudoku):
+   return column_to_row(naked_pairs_rows(column_to_row(sudoku)))
 
 
 
