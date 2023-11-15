@@ -62,7 +62,7 @@ def column_remover(sudoku):
 # remove by grid function
 # rowcols is to look for list of potentials, n is the column index and m is the box index to check each square for
 # numbers already given/solved to remove from list of potentials
-def remove_by_grid(sudoku):
+def grid_remover(sudoku):
     for row in range(9):
         for cols in range(9):
             if is_list(sudoku[row][cols]):
@@ -82,36 +82,33 @@ def list_to_int(sudoku):
                 row[cols] = row[cols][0]
     return sudoku
 
+# performs simple elimination until it cannot make further changes
 
-
-def test_1(sudoku):
-    sudokucopy = copy.deepcopy(sudoku)
-    solved = False  # Initializing the while loop
-    # times_looped = 0
-    while solved == False:
-        # times_looped = times_looped+1 #added this for interest to see how many iterations it takes.
-        # Save the current state of the Sudoku before making any changes
-        # previous_state = copy.deepcopy(sudoku)
-
-        previous_state = [row[:] for row in sudokucopy] # slicing allows to make copies without altering the original code
-
-        # Apply your solving functions repeatedly until no more changes are made
-        convert_to_listed(sudokucopy)
-        row_remover(sudokucopy)
-        column_remover(sudokucopy)
-        remove_by_grid(sudokucopy)
-        list_to_int(sudokucopy)
-
-        if sudokucopy == previous_state:
-            solved = True
-        # Check if the Sudoku has changed after applying the functions
-
-    return  sudokucopy
+def simple_elimination(puzzle):
+    
+    puzzle2 = copy.deepcopy(puzzle)
+    
+    convert_to_listed(puzzle2)
+    
+    same = False
+    
+    while same == False:
+        
+        puzzle_copy = copy.deepcopy(puzzle2)
+    
+        row_remover(puzzle2)
+        column_remover(puzzle2)
+        grid_remover(puzzle2)
+        
+        if puzzle_copy == puzzle2:
+            same = True
+            
+    return list_to_int(puzzle2)
 
         
 # Find The naked pairs by row (input has to be the row)
 
-def find_naked_pairs_rows(row):
+def find_naked_pairs(row):
     pairs = []
     nakedpairs = []
     
@@ -127,17 +124,18 @@ def find_naked_pairs_rows(row):
                             if pairs[i] == pairs[j] and pairs[i][0] and pairs[i][1] not in nakedpairs:
                                 nakedpairs.append(pairs[i][0])
                                 nakedpairs.append(pairs[i][1])
+                            
    
     return nakedpairs
 
-# Applies find_naked_pairs_rows to each row in the sudoku then removes them 
+# Applies find_naked_pairs to each row in the sudoku then removes them 
 # from any lists that are not the naked pairs themselves 
 
 def naked_pairs_rows(sudoku):
     sudokucopy = copy.deepcopy(sudoku)
     
     for row in sudokucopy:
-        naked_pair = find_naked_pairs_rows(row)
+        naked_pair = find_naked_pairs(row)
         
         for col in row:
             
@@ -163,29 +161,75 @@ def naked_pairs_rows(sudoku):
    
     return list_to_int(sudokucopy)   
 
+# We decided to change the sudoku columns and grids to rows so we could use 
+# the same function and then convert them back
 
+# This function changes the sudoku to a list of columns
 
-
-
-first = test_1(puzzle) 
-print(naked_pairs_rows(first))
-
-def column_to_row(list_of_lists):
+def column_shuffle(sudoku):
     unlisted = []
     # a list of all the entries in row order unlisted
-    for row in range(len(list_of_lists)): 
-        for col in range(len(list_of_lists)):
-                unlisted.append(list_of_lists[col][row])
+   
+    for row in range(len(sudoku)): 
+        
+        for col in range(len(sudoku)):
+                unlisted.append(sudoku[col][row])
+    
     relisted = []
     # putting entries into 9 lists of 9
+    
     for i in range(0, len(unlisted), 9):
         relisted.append(unlisted[i:i+9])
+    
     return relisted
 
+# This function applies naked pair elimination to columns
+
 def naked_pairs_cols(sudoku):
-   return column_to_row(naked_pairs_rows(column_to_row(sudoku)))
+   
+    return column_shuffle(naked_pairs_rows(column_shuffle(sudoku)))
 
+# This function changes the sudoku to a list of grids
 
+def grid_shuffle(sudoku):
+    rows = []
+    
+    for i in range(0,9,3):
+        
+        for j in range(0, 9, 3):
+            grid_as_row = []
+            
+            for k in range(3):
+                grid_as_row.extend(sudoku[i + k][j:j + 3])
+            rows.append(grid_as_row)
+    
+    return rows
+
+# This function applies naked pair elimination to grids
+
+def naked_pairs_grids(sudoku):
+    
+    return grid_shuffle(naked_pairs_rows(grid_shuffle(sudoku)))
+
+# Function to perform all versions of naked pairs until no further chnages 
+# can be made
+
+def naked_pairs_elimination(puzzle):
+    
+    same = False
+    
+    while same == False:
+        
+        puzzle_copy = copy.deepcopy(puzzle)
+        
+        naked_pairs_rows(puzzle)
+        naked_pairs_cols(puzzle)
+        naked_pairs_grids(puzzle)
+        
+        if puzzle_copy == puzzle:
+            same = True
+            
+    return puzzle
 
 
 
