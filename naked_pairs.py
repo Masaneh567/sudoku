@@ -84,26 +84,26 @@ def list_to_int(sudoku):
 
 # performs simple elimination until it cannot make further changes
 
-def simple_elimination(puzzle):
+def simple_elimination(sudoku):
     
-    puzzle2 = copy.deepcopy(puzzle)
+    sudoku_copied = copy.deepcopy(sudoku)
     
-    convert_to_listed(puzzle2)
+    convert_to_listed(sudoku_copied)
     
     same = False
     
     while same == False:
         
-        puzzle_copy = copy.deepcopy(puzzle2)
+        sudoku_original = copy.deepcopy(sudoku_copied)
     
-        row_remover(puzzle2)
-        column_remover(puzzle2)
-        grid_remover(puzzle2)
+        row_remover(sudoku_copied)
+        column_remover(sudoku_copied)
+        grid_remover(sudoku_copied)
         
-        if puzzle_copy == puzzle2:
+        if sudoku_original == sudoku_copied:
             same = True
             
-    return list_to_int(puzzle2)
+    return list_to_int(sudoku_copied)
 
         
 # Find The naked pairs by row (input has to be the row)
@@ -211,26 +211,25 @@ def naked_pairs_grids(sudoku):
     
     return grid_shuffle(naked_pairs_rows(grid_shuffle(sudoku)))
 
-# Function to perform all versions of naked pairs until no further chnages 
+# Function to perform all versions of naked pairs until no further changes 
 # can be made
 
-def naked_pairs_elimination(puzzle):
+def naked_pairs_elimination(sudoku):
     
     same = False
     
     while same == False:
         
-        puzzle_copy = copy.deepcopy(puzzle)
+        sudoku_original = copy.deepcopy(sudoku)
+ 
+        naked_pairs_rows(sudoku)
+        naked_pairs_cols(sudoku)
+        naked_pairs_grids(sudoku)
         
-        naked_pairs_rows(puzzle)
-        naked_pairs_cols(puzzle)
-        naked_pairs_grids(puzzle)
-        
-        if puzzle_copy == puzzle:
+        if sudoku_original == sudoku:
             same = True
             
-    return puzzle
-
+    return sudoku
 
 
 
