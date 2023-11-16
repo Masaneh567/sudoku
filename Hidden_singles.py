@@ -229,4 +229,86 @@ test_1(sudoku_puzzle_harder)
 ) #harder sudoku to test code with, this cannot be solved by simple elimination.
 
 
-# In[ ]:
+# In[ ]:  
+
+def confirm_column_hidden_singles(sudoku):  # removes hidden singles by column 
+    for x in range(9):
+        for y in range(9):
+            if is_list(sudoku[y][x]): 
+                freq_unique_candidates = [] 
+                for j in range(9): 
+                    unique_candidate_in_list = [candidate for candidate in sudoku[y][x] if isinstance(sudoku[j][x], list) and candidate not in sudoku[j][x] or isinstance(sudoku[j][x], int) and candidate != sudoku[j][x]]
+                    freq_unique_candidates.extend(unique_candidate_in_list) 
+                    
+                    
+                candidate_count = {}
+                for candidate in freq_unique_candidates:
+                    if candidate in candidate_count:
+                        candidate_count[candidate] += 1
+                    else:
+           
+                        candidate_count[candidate] = 1
+
+    # Find the element with a count of 8 , this is becasue the way ive set it up an element which is unique compared to another element in the row it will be added to a list, so if it appears 8 times then it is unique to the row entirely. 
+                unique_candidate = None
+                for candidate, count in candidate_count.items():
+                    if count == 8:
+                        if unique_candidate is None:
+                            unique_candidate = candidate 
+                        else: 
+                            unique_candidate = None 
+                            break
+                    
+                         
+                        
+                        
+            # If there is more than one candidate counted 8 times, exit the loop
+                if unique_candidate is not None:
+                    sudoku[y][x] = unique_candidate 
+                    
+    return sudoku 
+
+
+
+
+def confirm_grid_hidden_singles(sudoku):   # confirms hidden singles by grid. 
+    for y in range(9):
+        for x in range(9):
+            if is_list(sudoku[y][x]): 
+                freq_unique_candidates= []
+                first_grid_row = (x // 3) * 3
+                first_grid_column = (y // 3) * 3
+                for n in range(first_grid_row,first_grid_row+3):
+                    for m in range(first_grid_column, first_grid_column+3):
+                        unique_candidate_in_list = [candidate for candidate in sudoku[y][x] if isinstance(sudoku[m][n], list) and candidate not in sudoku[m][n] or isinstance(sudoku[m][n], int) and candidate != sudoku[m][n]]
+                        freq_unique_candidates.extend(unique_candidate_in_list) 
+                    
+                candidate_count = {}
+                for candidate in freq_unique_candidates:
+                    if candidate in candidate_count:
+                        candidate_count[candidate] += 1
+                    else:
+           
+                        candidate_count[candidate] = 1
+
+    # Find the element with a count of 8 , this is becasue the way ive set it up an element which is unique compared to another element in the row it will be added to a list, so if it appears 8 times then it is unique to the row entirely. 
+                unique_candidate = None
+                for candidate, count in candidate_count.items():
+                    if count == 8:
+                        if unique_candidate is None:
+                            unique_candidate = candidate 
+                        else: 
+                            unique_candidate = None 
+                            break
+                    
+                         
+                        
+                        
+            # If there is more than one candidate counted 8 times, exit the loop
+                if unique_candidate is not None:
+                    sudoku[y][x] = unique_candidate 
+                    
+    return sudoku
+
+
+
