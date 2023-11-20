@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Nov  8 15:19:05 2023
-
-@author: miaglynn
-"""
 
 puzzle = [[4, 0, 0, 0, 0, 0, 9, 3, 8],
           [0, 3, 2, 0, 9, 4, 1, 0, 0],
