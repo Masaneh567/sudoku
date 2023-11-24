@@ -1,0 +1,20 @@
+def backtracker(sudoku):
+    if is_sudoku_solved(sudoku):
+        return sudoku  # Base case: Sudoku is already solved
+
+    for row in range(9):
+        for col in range(9):
+            if is_list(sudoku[row][col]):
+                for value in sudoku[row][col]:
+                    if is_valid_move(sudoku, row, col, value):
+                        sudoku_copy = [row[:] for row in sudoku]
+                        sudoku[row][col] = value  # Place the number
+
+                        result = backtracker(sudoku_copy)  # Recursive call: Try to solve the Sudoku with the current digit
+                        if is_sudoku_solved(result):
+                            return result  # If successful, return the solved Sudoku
+
+                # If no valid move is found, backtrack
+                sudoku[row][col] = sudoku[row][col][:]
+
+    return sudoku
