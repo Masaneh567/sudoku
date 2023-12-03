@@ -373,79 +373,26 @@ def sudoku_solver(puzzle):
     puzzle = main_loop(puzzle)
     return puzzle
 
-# USER INPUT THE SUDOKU NOT SURE HOW TO MAKE THIS QUICKER WILL EXPLORE
-# LEARN ON WORK WITH STRINGS
-'''
-print("Enter your sudoku puzzle. (Write 0 for an empty cell). ")
-x_1 = []
+
+print("Enter your sudoku puzzle row by row, with a space between entries. (Write 0 for an empty cell). ")
+sudoku = []
 for i in range(9):
     istr = str(i + 1)
-    entry = input('Enter row 1 element ' + istr + ': ')
-    x_1.append(int(entry))
-x_2 = []
-for i in range(9):
-    istr = str(i + 1)
-    entry = input('Enter row 2 element ' + istr + ': ')
-    x_2.append(int(entry))
-x_3 = []
-for i in range(9):
-    istr = str(i + 1)
-    entry = input('Enter row 3 element ' + istr + ': ')
-    x_3.append(int(entry))
-x_4 = []
-for i in range(9):
-    istr = str(i + 1)
-    entry = input('Enter row 4 element ' + istr + ': ')
-    x_4.append(int(entry))
-x_5 = []
-for i in range(9):
-    istr = str(i + 1)
-    entry = input('Enter row 5 element ' + istr + ': ')
-    x_5.append(int(entry))
-x_6 = []
-for i in range(9):
-    istr = str(i + 1)
-    entry = input('Enter row 6 element ' + istr + ': ')
-    x_6.append(int(entry))
-x_7 = []
-for i in range(9):
-    istr = str(i + 1)
-    entry = input('Enter row 7 element ' + istr + ': ')
-    x_7.append(int(entry))
-x_8 = []
-for i in range(9):
-    istr = str(i + 1)
-    entry = input('Enter row 8 element ' + istr + ': ')
-    x_8.append(int(entry))
-x_9 = []
-for i in range(9):
-    istr = str(i + 1)
-    entry = input('Enter row 9 element ' + istr + ': ')
-    x_9.append(int(entry))
-sudoku = [x_1, x_2, x_3, x_4, x_5, x_6, x_7, x_8, x_9]
+    b = input('Enter row number ' + istr + ' :' )
+    numbers = b.split(' ')
+    row = [int(i) for i in numbers]
+    sudoku.append(row)
 
 print('This is your inputted sudoku: ')
-print(sudoku)
-
-print(sudoku_solver(sudoku))
-'''
-
-
-puzzle = [[0, 2, 1, 0, 8, 0, 4, 0, 9],
-          [9, 0, 0, 0, 0, 0, 0, 6, 2],
-          [6, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 7, 4, 0, 0, 0, 9, 1, 3],
-          [1, 5, 9, 3, 4, 0, 6, 0, 0],
-          [0, 3, 6, 1, 9, 0, 0, 0, 4],
-          [0, 1, 8, 0, 0, 0, 0, 4, 5],
-          [4, 9, 0, 8, 0, 1, 7, 0, 6],
-          [0, 6, 2, 4, 0, 3, 0, 9, 0]]
-
-# Change sudoku to puzzle when checking
+for i in range(9):
+    print(sudoku[i])
 puzzle1 = sudoku_solver(sudoku)
 if is_solved(puzzle1):
     print("Here is your solved puzzle: ")
-    print(puzzle1)
+    for i in range(9):
+        print(puzzle1[i])
 else:
     print("I was unable to solve your puzzle. This is as far as I could solve it: ")
-    print(failed_sudoku(puzzle1))
+    puzzle2 = failed_sudoku(puzzle1)
+    for i in range(9):
+        print(puzzle2[i])
