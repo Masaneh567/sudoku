@@ -378,7 +378,7 @@ print("Enter your sudoku puzzle row by row, with a space between entries. (Write
 sudoku = []
 for i in range(9):
     istr = str(i + 1)
-    b = input('Enter row number ' + istr + ' :' )
+    b = input('Enter row number ' + istr + ' : ' )
     numbers = b.split(' ')
     row = [int(i) for i in numbers]
     sudoku.append(row)
