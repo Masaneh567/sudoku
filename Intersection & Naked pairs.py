@@ -1,7 +1,7 @@
 import copy
 
 
-# INITIAL
+# INITIAL STEPS CODE
 def convert_to_listed(puzzle):
     for row in puzzle:
         for cols in range(9):
@@ -88,30 +88,19 @@ def box_remover(puzzle):
 
     return puzzle_reduced
 
-
-# I DONT LIKE KEEP THE LOOPS IN THE END MAIN FUNCTION AND ONLY WANNA CONVERT TO LIST ONCE CANT REMOVE AS MATT FUNCTION
-# CALLS THIS THOUGH
-def initial_step(puzzle):
-    convert_to_listed(puzzle)
-
-    same = False
-
-    while same == False:
-
-        puzzle_copy = copy.deepcopy(puzzle)
-
-        row_remover(puzzle)
-        column_remover(puzzle)
-        box_remover(puzzle)
-        list_to_int(puzzle)
-
-        if puzzle_copy == puzzle:
-            same = True
-
+def simple_elim(puzzle):
+    row_remover(puzzle)
+    list_to_int(puzzle)
+    column_remover(puzzle)
+    list_to_int(puzzle)
+    box_remover(puzzle)
+    list_to_int(puzzle)
     return puzzle
 
+# INITIAL STEPS CODE END
 
-# INTERSECTION
+# INTERSECTION CODE
+
 def pointing_rows(puzzle, row, col, num):
     box_col = (col // 3) * 3
     box_row = (row // 3) * 3
@@ -127,14 +116,18 @@ def pointing_rows(puzzle, row, col, num):
     # how many times num appears in lists inside that box
     box_count = 0
 
+    #for the box we are in
     for i in range(box_row, box_row + 3):
         for j in range(box_col, box_col + 3):
+            #if it is a list and the number we are looking for is in that list
             if is_list(puzzle[i][j]) and num in puzzle[i][j]:
+                #add 1 to box count
                 box_count += 1
 
     # how many times num appears in lists in that box in that row
     row_box_count = 0
 
+    #for the box we are in
     for i in range(box_col, box_col + 3):
         if is_list(puzzle[row][i]) and num in puzzle[row][i]:
             row_box_count += 1
@@ -183,7 +176,7 @@ def pointing_cols(puzzle, row, col, num):
 
 
 def pointing_rows_reduction(puzzle):
-    puzzle_reduced = initial_step(puzzle)
+    puzzle_reduced = box_remover(puzzle)
 
     for row in range(9):
         for col in range(9):
@@ -196,7 +189,7 @@ def pointing_rows_reduction(puzzle):
 
 
 def pointing_cols_reduction(puzzle):
-    puzzle_reduced = initial_step(puzzle)
+    puzzle_reduced = box_remover(puzzle)
 
     for row in range(9):
         for col in range(9):
@@ -286,42 +279,130 @@ def box_line_reduction(sudoku):
 
     return puzzle_reduced
 
-
-# THIS ISNT NEEDED SAME REASON AS INITIAL STEP
-'''
-def intersection(puzzle):
-    same = False
-
-    initial_step(puzzle)
-
-    while same == False:
-
-        puzzle_copy = copy.deepcopy(puzzle)
-
-        initial_step(puzzle)
-        pointing_reduction(puzzle)
-        box_line_reduction(puzzle)
-
-        if puzzle_copy == puzzle:
-            same = True
-
-    return puzzle
-'''
-
+# INTERSECTION CODE END
 
 # ADD IN EVERYONE ELSE'S FUNCTIONS HERE
 ###
 
-# REPLACES INITIAL STEP
-def simple_elim(puzzle):
-    row_remover(puzzle)
-    list_to_int(puzzle)
-    column_remover(puzzle)
-    list_to_int(puzzle)
-    box_remover(puzzle)
-    list_to_int(puzzle)
-    return puzzle
 
+# NAKED PAIRS CODE
+
+def find_naked_pairs(row):
+    pairs = []
+    nakedpairs = []
+    
+    for col in range(9):
+        
+        if is_list(row[col]) and len(row[col]) == 2:
+                    pairs.append(row[col])
+                    
+                    for i in range(len(pairs)):
+                        
+                        for j in range(i + 1, len(pairs)):
+                            
+                            if pairs[i] == pairs[j] and pairs[i][0] and pairs[i][1] not in nakedpairs:
+                                nakedpairs.append(pairs[i][0])
+                                nakedpairs.append(pairs[i][1])
+                            
+   
+    return nakedpairs
+
+# Applies find_naked_pairs to each row in the sudoku then removes them 
+# from any lists that are not the naked pairs themselves 
+
+def naked_pairs_rows(sudoku):
+    sudokucopy = copy.deepcopy(sudoku)
+    
+    for row in sudokucopy:
+        naked_pair = find_naked_pairs(row)
+        
+        for col in row:
+            
+            if is_list(naked_pair):
+             
+                for x in naked_pair:
+                   
+                     if is_list(col) and len(col) > 2:
+                        
+                         for x in naked_pair:
+                            
+                             if x in col:
+                                col.remove(x)\
+                                    
+                     if is_list(col) and len(col) == 2:
+                         
+                         if col[0] not in naked_pair or col[1] not in naked_pair:
+                            
+                             for x in naked_pair:
+                                
+                                 if x in col:
+                                    col.remove(x)
+   
+    return list_to_int(sudokucopy)   
+
+# We decided to change the sudoku columns and grids to rows so we could use 
+# the same function and then convert them back
+
+# This function changes the sudoku to a list of columns
+
+def column_shuffle(sudoku):
+    unlisted = []
+    # a list of all the entries in row order unlisted
+   
+    for row in range(len(sudoku)): 
+        
+        for col in range(len(sudoku)):
+                unlisted.append(sudoku[col][row])
+    
+    relisted = []
+    # putting entries into 9 lists of 9
+    
+    for i in range(0, len(unlisted), 9):
+        relisted.append(unlisted[i:i+9])
+    
+    return relisted
+
+# This function applies naked pair elimination to columns
+
+def naked_pairs_cols(sudoku):
+   
+    return column_shuffle(naked_pairs_rows(column_shuffle(sudoku)))
+
+# This function changes the sudoku to a list of grids
+
+def grid_shuffle(sudoku):
+    rows = []
+    
+    for i in range(0,9,3):
+        
+        for j in range(0, 9, 3):
+            grid_as_row = []
+            
+            for k in range(3):
+                grid_as_row.extend(sudoku[i + k][j:j + 3])
+            rows.append(grid_as_row)
+    
+    return rows
+
+# This function applies naked pair elimination to grids
+
+def naked_pairs_grids(sudoku):
+    
+    return grid_shuffle(naked_pairs_rows(grid_shuffle(sudoku)))
+
+def naked_pairs_elimination(sudoku):
+    
+    sudoku2 = naked_pairs_rows(sudoku)
+    sudoku3 = naked_pairs_cols(sudoku2)
+    sudoku4 = naked_pairs_grids(sudoku3)
+
+    puzzle_reduced = list_to_int(sudoku4)
+
+    return puzzle_reduced
+
+# NAKED PAIRS END
+
+# MAIN LOOP CODE
 
 # THESE ARE THE LOOPS CALLING YOUR FUNCTIONS CHECK FUNCTIONS FINISH WITH A LIST TO INTEGER/INCLUDE IN HERE
 def main_loop(puzzle):
@@ -346,6 +427,7 @@ def main_loop(puzzle):
                 if not puzzle_copy == puzzle:
                     main_loop(puzzle)
                 else: etcetcetc'''
+                
     return puzzle
 
 
@@ -373,6 +455,11 @@ def sudoku_solver(puzzle):
     puzzle = main_loop(puzzle)
     return puzzle
 
+# MAIN LOOP CODE END
+
+
+# USER INTERFACE CODE
+
 
 print("Enter your sudoku puzzle row by row, with a space between entries. (Write 0 for an empty cell). ")
 sudoku = []
@@ -382,6 +469,7 @@ for i in range(9):
     numbers = b.split(' ')
     row = [int(i) for i in numbers]
     sudoku.append(row)
+
 
 print('This is your inputted sudoku: ')
 for i in range(9):
@@ -393,6 +481,19 @@ if is_solved(puzzle1):
         print(puzzle1[i])
 else:
     print("I was unable to solve your puzzle. This is as far as I could solve it: ")
+    for i in range(9):
+        print(puzzle1[i])
+    print("This is as far as i could solve it, replacing all lists with 0's")
     puzzle2 = failed_sudoku(puzzle1)
     for i in range(9):
         print(puzzle2[i])
+
+# USER INTERFACE CODE END
+
+
+
+
+
+
+
+
