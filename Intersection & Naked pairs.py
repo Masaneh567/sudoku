@@ -311,26 +311,25 @@ def find_naked_pairs(row):
 # from any lists that are not the naked pairs themselves 
 
 def naked_pairs_rows(sudoku):
-    sudokucopy = copy.deepcopy(sudoku)
     
-    for row in sudokucopy:
+    for row in sudoku:
         naked_pair = find_naked_pairs(row)
         
         for col in row:
             
-            if is_list(naked_pair):
-             
-                for x in naked_pair:
-                   
-                     if is_list(col) and len(col) > 2:
-                        
+            for x in naked_pair:
+               
+                 if is_list(col):
+                     
+                     if len(col) > 2:
+                    
                          for x in naked_pair:
                             
                              if x in col:
-                                col.remove(x)\
-                                    
-                     if is_list(col) and len(col) == 2:
-                         
+                                col.remove(x)
+                                
+                     if len(col) == 2:
+                     
                          if col[0] not in naked_pair or col[1] not in naked_pair:
                             
                              for x in naked_pair:
@@ -338,7 +337,7 @@ def naked_pairs_rows(sudoku):
                                  if x in col:
                                     col.remove(x)
    
-    return list_to_int(sudokucopy)   
+    return list_to_int(sudoku)  
 
 # We decided to change the sudoku columns and grids to rows so we could use 
 # the same function and then convert them back
