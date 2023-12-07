@@ -105,6 +105,7 @@ def pointing_rows(puzzle, row, col, num):
     box_col = (col // 3) * 3
     box_row = (row // 3) * 3
 
+    # index = list(range(9))???
     index = []
     for i in range(9):
         index.append(i)
