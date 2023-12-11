@@ -216,7 +216,8 @@ def pointing_reduction(puzzle):
     return puzzle_reduced3
 
 
-def row_pots_list(num, row, cols, sudoku):
+def row_pots_list(num, row, cols, sudoku1):
+    sudoku = row_remover(sudoku1)
     row_count = 0
     for i in range(9):
         if is_list(sudoku[row][i]) and num in sudoku[row][i]:
@@ -237,7 +238,8 @@ def row_pots_list(num, row, cols, sudoku):
     return sudoku
 
 
-def col_pots_list(num, row, cols, sudoku):
+def col_pots_list(num, row, cols, sudoku1):
+    sudoku = column_remover(sudoku1)
     col_count = 0
     for i in range(9):
         if is_list(sudoku[i][cols]) and num in sudoku[i][cols]:
@@ -259,23 +261,22 @@ def col_pots_list(num, row, cols, sudoku):
 
 
 def box_row_reduction(sudoku):
-    sudoku2 = row_remover(sudoku)
+
     for row in range(9):
         for cols in [0, 3, 6]:
             for num in range(1, 10):
-                sudoku2 = row_pots_list(num, row, cols, sudoku2)
+                sudoku2 = row_pots_list(num, row, cols, sudoku)
     return sudoku2
 
 
 def box_cols_reduction(sudoku):
-    sudoku2 = column_remover(sudoku)
+    
     for cols in range(9):
         for row in [0, 3, 6]:
             for num in range(1, 10):
-                sudoku2 = col_pots_list(num, row, cols, sudoku2)
+                sudoku2 = col_pots_list(num, row, cols, sudoku)
 
     return sudoku2
-
 
 def box_line_reduction(sudoku):
     sudoku2 = box_row_reduction(sudoku)
