@@ -106,7 +106,9 @@ def simple_elim(puzzle):
 
 # INTERSECTION CODE
 
-def pointing_rows(puzzle, row, col, num):
+def pointing_rows(puzzle2, row, col, num):
+    
+    # INDEXING
     box_col = (col // 3) * 3
     box_row = (row // 3) * 3
 
@@ -117,6 +119,11 @@ def pointing_rows(puzzle, row, col, num):
     index.remove(box_col)
     index.remove(box_col + 1)
     index.remove(box_col + 2)
+    
+    # BOX MUST BE REDUCED FOR IT TO WORK
+    # ROW MUST BE REDUCED FOR IT TO WORK
+    puzzle1 = box_remover(puzzle2)
+    puzzle = row_remover(puzzle1)
 
     # how many times num appears in lists inside that box
     box_count = 0
@@ -145,7 +152,7 @@ def pointing_rows(puzzle, row, col, num):
     return puzzle
 
 
-def pointing_cols(puzzle, row, col, num):
+def pointing_cols(puzzle2, row, col, num):
     box_col = (col // 3) * 3
     box_row = (row // 3) * 3
 
@@ -156,6 +163,11 @@ def pointing_cols(puzzle, row, col, num):
     index.remove(box_row)
     index.remove(box_row + 1)
     index.remove(box_row + 2)
+    
+    # BOX MUST BE REDUCED FOR IT TO WORK
+    # COL MUST BE REDUCED FOR IT TO WORK
+    puzzle1 = box_remover(puzzle2)
+    puzzle = row_remover(puzzle1)
 
     # how many times num appears in lists inside that box
     box_count = 0
@@ -685,30 +697,38 @@ def test_loop(puzzle):
         print(puzzle)
         puzzle1 = convert_to_listed(puzzle)
         # INSERT THE FUNCTION YOU WANT TO TEST LOOP BELOW
-        puzzle2 = backtracker(puzzle1)
+        puzzle2 = simple_elim(puzzle1)
+        puzzle3 = pointing_reduction(puzzle2)
+        puzzle4 = box_line_reduction(puzzle3)
+        puzzle5 = hidden_singles_elimination(puzzle4)
+        puzzle6 = naked_pairs_elimination(puzzle5)
         
-        if puzzle2 == puzzle_copy:
+        if puzzle6 == puzzle_copy:
             same = True
             
     return puzzle
 
 # This is a solvable sudoku that can be used for testing purposes
-sudoku =[[3,0,9,0,0,0,4,0,0],
-        [0,0,0,0,8,0,3,0,0],
-        [0,6,0,0,0,7,0,9,8],
-        [0,0,6,0,4,0,0,1,2],
-        [0,0,0,0,0,0,9,0,0],
-        [0,7,0,5,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,3],
-        [2,0,0,0,0,4,0,0,0],
-        [0,0,1,0,2,0,0,8,6]]
-        
-        
+sudoku =[[4, 0, 0, 0, 0, 0, 9, 3, 8],
+          [0, 3, 2, 0, 9, 4, 1, 0, 0],
+          [0, 9, 5, 3, 0, 0, 2, 4, 0],
+          [3, 7, 0, 6, 0, 9, 0, 0, 4],
+          [5, 2, 9, 0, 0, 1, 6, 7, 3],
+          [6, 0, 4, 7, 0, 3, 0, 9, 0],
+          [9, 5, 7, 0, 0, 8, 3, 0, 0],
+          [0, 0, 3, 9, 0, 0, 4, 0, 0],
+          [2, 4, 0, 0, 3, 0, 7, 0, 9]]
+
 print('This is your inputted sudoku: ')
-print(sudoku)
+for i in range(9):
+    print(sudoku[i])
     
 puzzle = convert_to_listed(sudoku)
-print(test_loop(puzzle))
+puzzle_complete = test_loop(puzzle)
+
+print("Here is your solved puzzle: ")
+for i in range(9):
+    print(puzzle_complete[i])
 
 # TESTING CODE END
 '''
@@ -743,7 +763,6 @@ else:
         print(puzzle2[i])
 
 # USER INTERFACE CODE END
-
 
 
 
