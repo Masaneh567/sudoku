@@ -567,44 +567,47 @@ def is_sudoku_solved(sudoku):
         
         for col in row:
 
-            if not (type(col) == int and 1 <= col <= 9):
+            if is_list(col) or col == 0:
                 solved = False
 
-    return solved        
+    return solved
                 
 
-def is_valid_move(sudoku, row, col, num):
-    # Check if 'num' is already in the same row or column
+def find_empty_location(sudoku):
     for i in range(9):
-        if sudoku[row][i] == num or sudoku[i][col] == num:
-            return False
+        for j in range(9):
+            if sudoku[i][j] == 0 or is_list(sudoku[i][j]):
+                return i, j
+    return None
 
-    # Check if 'num' is in the 3x3 box
-    box_start_row, box_start_col = 3 * (row // 3), 3 * (col // 3)
-    for i in range(box_start_row, box_start_row + 3):
-        for j in range(box_start_col, box_start_col + 3):
-            if sudoku[i][j] == num:
-                return False
+def is_valid_guess(sudoku, row, col, num):
+    for i in range(9):
+        if sudoku[row][i] == num or sudoku[i][col] == num or sudoku[(row // 3) * 3 + i // 3][(col // 3) * 3 + i % 3] == num:
+            return False
+    return True
 
 def backtracker(sudoku):
-    print('Backtracker')
     if is_sudoku_solved(sudoku):
-        return sudoku  # Base case: Sudoku is already solved
+        return sudoku
 
-    for row in range(9):
-        for col in range(9):
-            if is_list(sudoku[row][col]):
-                for value in sudoku[row][col]:
-                    if is_valid_move(sudoku, row, col, value):
-                        sudoku_copy = [row[:] for row in sudoku]
-                        sudoku[row][col] = value  # Place the number
+    empty_location = find_empty_location(sudoku)
+    
+    if empty_location:
+        row, col = empty_location
 
-                        result = backtracker(sudoku_copy)  # Recursive call: Try to solve the Sudoku with the current digit
-                        if is_sudoku_solved(result):
-                            return result  # If successful, return the solved Sudoku
-
-                # If no valid move is found, backtrack
-                sudoku[row][col] = sudoku[row][col][:]
+        for num in sudoku[row][col]:
+           
+            if is_valid_guess(sudoku, row, col, num):
+                sudoku_copy = copy.deepcopy(sudoku)
+                sudoku_copy[row][col] = num
+                
+                result = backtracker(sudoku_copy)  
+                if is_sudoku_solved(result):
+                    for i in range(9):
+                        for j in range(9):
+                            sudoku[i][j] = sudoku_copy[i][j]
+    
+                    return sudoku
 
     return sudoku
 
