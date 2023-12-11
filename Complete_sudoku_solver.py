@@ -25,8 +25,11 @@ def list_to_int(puzzle):
                 row[cols] = row[cols][0]
     return puzzle
 
+# INITIAL STEPS CODE END
 
-# SIMPLE ELIM
+
+# SIMPLE ELIM CODE
+
 # remove by row function
 # rowcols is to look for list of potentials, rowcols2 is the numbers already given/solved in the sudoku to remove from
 # list of potentials
@@ -99,7 +102,7 @@ def simple_elim(puzzle):
     print('Simple_Elimination')
     return puzzle
 
-# INITIAL STEPS CODE END
+# SIMPLE ELIM CODE END
 
 # INTERSECTION CODE
 
@@ -610,17 +613,17 @@ def main_loop(puzzle):
             main_loop(puzzle)
         else:
             puzzle_copy = copy.deepcopy(puzzle)
-            puzzle = box_line_reduction(puzzle)
+            naked_pairs_elimination(puzzle) 
             if not puzzle_copy == puzzle:
                 main_loop(puzzle)
             else:
                 puzzle_copy = copy.deepcopy(puzzle)
-                puzzle = pointing_reduction(puzzle)
+                puzzle = box_line_reduction(puzzle)
                 if not puzzle_copy == puzzle:
                     main_loop(puzzle)
                 else:
                     puzzle_copy = copy.deepcopy(puzzle)
-                    naked_pairs_elimination(puzzle) 
+                    puzzle = pointing_reduction(puzzle)
                     if not puzzle_copy == puzzle:
                         main_loop(puzzle)
                     else:
@@ -628,7 +631,7 @@ def main_loop(puzzle):
                         backtracker(puzzle) 
                         if not puzzle_copy == puzzle:
                             main_loop(puzzle)
-                        '''else: etc'''
+                            '''else: etc'''
                 
     return puzzle
 
@@ -660,6 +663,55 @@ def sudoku_solver(puzzle):
 # MAIN LOOP CODE END
 
 
+# TESTING CODE
+
+# This code is purely for testing purposes and is not used at all in the final
+# product.
+
+# When using the testing code please comment out the UI code before using.
+
+# When not using the testing code please comment out like it is now.
+
+'''
+
+def test_loop(puzzle):
+    
+    same = False
+    
+    while same == False:
+        
+        puzzle_copy = copy.deepcopy(puzzle)
+        print(puzzle)
+        puzzle1 = convert_to_listed(puzzle)
+        # INSERT THE FUNCTION YOU WANT TO TEST LOOP BELOW
+        puzzle2 = backtracker(puzzle1)
+        
+        if puzzle2 == puzzle_copy:
+            same = True
+            
+    return puzzle
+
+# This is a solvable sudoku that can be used for testing purposes
+sudoku =[[3,0,9,0,0,0,4,0,0],
+        [0,0,0,0,8,0,3,0,0],
+        [0,6,0,0,0,7,0,9,8],
+        [0,0,6,0,4,0,0,1,2],
+        [0,0,0,0,0,0,9,0,0],
+        [0,7,0,5,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,3],
+        [2,0,0,0,0,4,0,0,0],
+        [0,0,1,0,2,0,0,8,6]]
+        
+        
+print('This is your inputted sudoku: ')
+print(sudoku)
+    
+puzzle = convert_to_listed(sudoku)
+print(test_loop(puzzle))
+
+# TESTING CODE END
+'''
+
 # USER INTERFACE CODE
 
 print("Enter your sudoku puzzle row by row, with a space between entries. (Write 0 for an empty cell). ")
@@ -670,7 +722,7 @@ for i in range(9):
     numbers = b.split(' ')
     row = [int(i) for i in numbers]
     sudoku.append(row)
-
+    
 
 print('This is your inputted sudoku: ')
 for i in range(9):
@@ -690,14 +742,6 @@ else:
         print(puzzle2[i])
 
 # USER INTERFACE CODE END
-
-
-
-
-
-
-
-
 
 
 
