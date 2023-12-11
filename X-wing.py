@@ -109,7 +109,7 @@ def row_x_wing(sudoku):
     # removes candidate from cells in each row in given columns except for rows in x-wing
     for n, r1, r2, c1, c2 in product(candidates, row1, row2, col1, col2):
         for row in sudoku:
-            if row != r1 and row != r2:
+            if row != r1 or row != r2:
                 if n in row[c1]:
                     row[c1].remove(n)
                     if n in row[c2]:
