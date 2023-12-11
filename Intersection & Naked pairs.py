@@ -2,6 +2,7 @@ import copy
 
 
 # INITIAL STEPS CODE
+
 def convert_to_listed(puzzle):
     for row in puzzle:
         for cols in range(9):
@@ -24,8 +25,11 @@ def list_to_int(puzzle):
                 row[cols] = row[cols][0]
     return puzzle
 
+# INITIAL STEPS CODE END
 
-# SIMPLE ELIM
+
+# SIMPLE ELIM CODE
+
 # remove by row function
 # rowcols is to look for list of potentials, rowcols2 is the numbers already given/solved in the sudoku to remove from
 # list of potentials
@@ -95,17 +99,19 @@ def simple_elim(puzzle):
     list_to_int(puzzle)
     box_remover(puzzle)
     list_to_int(puzzle)
+    print('Simple_Elimination')
     return puzzle
 
-# INITIAL STEPS CODE END
+# SIMPLE ELIM CODE END
 
 # INTERSECTION CODE
 
-def pointing_rows(puzzle, row, col, num):
+def pointing_rows(puzzle2, row, col, num):
+    
+    # INDEXING
     box_col = (col // 3) * 3
     box_row = (row // 3) * 3
 
-    # index = list(range(9))???
     index = []
     for i in range(9):
         index.append(i)
@@ -113,6 +119,11 @@ def pointing_rows(puzzle, row, col, num):
     index.remove(box_col)
     index.remove(box_col + 1)
     index.remove(box_col + 2)
+    
+    # BOX MUST BE REDUCED FOR IT TO WORK
+    # ROW MUST BE REDUCED FOR IT TO WORK
+    puzzle1 = box_remover(puzzle2)
+    puzzle = row_remover(puzzle1)
 
     # how many times num appears in lists inside that box
     box_count = 0
@@ -141,7 +152,7 @@ def pointing_rows(puzzle, row, col, num):
     return puzzle
 
 
-def pointing_cols(puzzle, row, col, num):
+def pointing_cols(puzzle2, row, col, num):
     box_col = (col // 3) * 3
     box_row = (row // 3) * 3
 
@@ -152,6 +163,11 @@ def pointing_cols(puzzle, row, col, num):
     index.remove(box_row)
     index.remove(box_row + 1)
     index.remove(box_row + 2)
+    
+    # BOX MUST BE REDUCED FOR IT TO WORK
+    # COL MUST BE REDUCED FOR IT TO WORK
+    puzzle1 = box_remover(puzzle2)
+    puzzle = row_remover(puzzle1)
 
     # how many times num appears in lists inside that box
     box_count = 0
@@ -207,11 +223,13 @@ def pointing_reduction(puzzle):
     puzzle_reduced2 = pointing_cols_reduction(puzzle_reduced1)
 
     puzzle_reduced3 = list_to_int(puzzle_reduced2)
+    print('Pointing_Reduction')
 
     return puzzle_reduced3
 
 
-def row_pots_list(num, row, cols, sudoku):
+def row_pots_list(num, row, cols, sudoku1):
+    sudoku = row_remover(sudoku1)
     row_count = 0
     for i in range(9):
         if is_list(sudoku[row][i]) and num in sudoku[row][i]:
@@ -232,7 +250,8 @@ def row_pots_list(num, row, cols, sudoku):
     return sudoku
 
 
-def col_pots_list(num, row, cols, sudoku):
+def col_pots_list(num, row, cols, sudoku1):
+    sudoku = column_remover(sudoku1)
     col_count = 0
     for i in range(9):
         if is_list(sudoku[i][cols]) and num in sudoku[i][cols]:
@@ -254,29 +273,29 @@ def col_pots_list(num, row, cols, sudoku):
 
 
 def box_row_reduction(sudoku):
-    sudoku2 = row_remover(sudoku)
+
     for row in range(9):
         for cols in [0, 3, 6]:
             for num in range(1, 10):
-                sudoku2 = row_pots_list(num, row, cols, sudoku2)
+                sudoku2 = row_pots_list(num, row, cols, sudoku)
     return sudoku2
 
 
 def box_cols_reduction(sudoku):
-    sudoku2 = column_remover(sudoku)
+    
     for cols in range(9):
         for row in [0, 3, 6]:
             for num in range(1, 10):
-                sudoku2 = col_pots_list(num, row, cols, sudoku2)
+                sudoku2 = col_pots_list(num, row, cols, sudoku)
 
     return sudoku2
-
 
 def box_line_reduction(sudoku):
     sudoku2 = box_row_reduction(sudoku)
     sudoku3 = box_cols_reduction(sudoku2)
 
     puzzle_reduced = list_to_int(sudoku3)
+    print('Box_Line_Reduction')
 
     return puzzle_reduced
 
@@ -284,6 +303,140 @@ def box_line_reduction(sudoku):
 
 # ADD IN EVERYONE ELSE'S FUNCTIONS HERE
 ###
+
+
+# HIDDEN SINGLES CODE
+
+def confirm_row_hidden_singles(sudoku):
+    for row in sudoku:
+        for x in range(9):
+            if is_list(row[x]):
+                freq_unique_candidates = []
+                for y in range(9):
+
+                    unique_candidate_in_list = [candidate for candidate in row[x] if isinstance(row[y], list) and candidate not in row[y] or isinstance(row[y], int) and candidate != row[y]]
+                    #print(unique_candidate_in_list)
+                    freq_unique_candidates.extend(unique_candidate_in_list)
+                #if len(unique_candidate_in_list) == 1:
+                    #row[x] = unique_candidate_in_list
+                #print(unique_candidate_in_list)
+
+
+                candidate_count = {}
+                for candidate in freq_unique_candidates:
+                    if candidate in candidate_count:
+                        candidate_count[candidate] += 1
+                    else:
+
+                        candidate_count[candidate] = 1
+
+    # Find the element with a count of 8 , this is becasue the way ive set it up an element which is unique compared to another element in the row it will be added to a list, so if it appears 8 times then it is unique to the row entirely.
+                unique_candidate = None
+                for candidate, count in candidate_count.items():
+                    if count == 8:
+                        if unique_candidate is None:
+                            unique_candidate = candidate
+                        else:
+                            unique_candidate = None
+                            break
+
+
+
+
+            # If there is more than one candidate counted 8 times, exit the loop
+                if unique_candidate is not None:
+                    row[x]=unique_candidate
+    return sudoku
+
+def confirm_column_hidden_singles(sudoku):  # removes hidden singles by column 
+    for x in range(9):
+        for y in range(9):
+            if is_list(sudoku[y][x]): 
+                freq_unique_candidates = [] 
+                for j in range(9): 
+                    unique_candidate_in_list = [candidate for candidate in sudoku[y][x] if isinstance(sudoku[j][x], list) and candidate not in sudoku[j][x] or isinstance(sudoku[j][x], int) and candidate != sudoku[j][x]]
+                    freq_unique_candidates.extend(unique_candidate_in_list) 
+                    
+                    
+                candidate_count = {}
+                for candidate in freq_unique_candidates:
+                    if candidate in candidate_count:
+                        candidate_count[candidate] += 1
+                    else:
+           
+                        candidate_count[candidate] = 1
+
+    # Find the element with a count of 8 , this is becasue the way ive set it up an element which is unique compared to another element in the row it will be added to a list, so if it appears 8 times then it is unique to the row entirely. 
+                unique_candidate = None
+                for candidate, count in candidate_count.items():
+                    if count == 8:
+                        if unique_candidate is None:
+                            unique_candidate = candidate 
+                        else: 
+                            unique_candidate = None 
+                            break
+                    
+                         
+                        
+                        
+            # If there is more than one candidate counted 8 times, exit the loop
+                if unique_candidate is not None:
+                    sudoku[y][x] = unique_candidate 
+                    
+    return sudoku 
+
+def confirm_grid_hidden_singles(sudoku):   # confirms hidden singles by grid. 
+    for y in range(9):
+        for x in range(9):
+            if is_list(sudoku[y][x]): 
+                freq_unique_candidates= []
+                first_grid_row = (x // 3) * 3
+                first_grid_column = (y // 3) * 3
+                for n in range(first_grid_row,first_grid_row+3):
+                    for m in range(first_grid_column, first_grid_column+3):
+                        unique_candidate_in_list = [candidate for candidate in sudoku[y][x] if isinstance(sudoku[m][n], list) and candidate not in sudoku[m][n] or isinstance(sudoku[m][n], int) and candidate != sudoku[m][n]]
+                        freq_unique_candidates.extend(unique_candidate_in_list) 
+                    
+                candidate_count = {}
+                for candidate in freq_unique_candidates:
+                    if candidate in candidate_count:
+                        candidate_count[candidate] += 1
+                    else:
+           
+                        candidate_count[candidate] = 1
+
+    # Find the element with a count of 8 , this is becasue the way ive set it up an element which is unique compared to another element in the row it will be added to a list, so if it appears 8 times then it is unique to the row entirely. 
+                unique_candidate = None
+                for candidate, count in candidate_count.items():
+                    if count == 8:
+                        if unique_candidate is None:
+                            unique_candidate = candidate 
+                        else: 
+                            unique_candidate = None 
+                            break
+                    
+                         
+                        
+                        
+            # If there is more than one candidate counted 8 times, exit the loop
+                if unique_candidate is not None:
+                    sudoku[y][x] = unique_candidate 
+                    
+    return sudoku
+
+def hidden_singles_elimination(sudoku):
+        
+    sudoku2 = confirm_row_hidden_singles(sudoku)
+    sudoku3 = confirm_column_hidden_singles(sudoku2)
+    sudoku4 = confirm_grid_hidden_singles(sudoku3)
+
+    puzzle_reduced = list_to_int(sudoku4)
+    print('Hidden_Singles_Elimination')
+    
+    return puzzle_reduced
+    
+
+# HIDDEN SINGLES CODE END
 
 
 # NAKED PAIRS CODE
@@ -312,25 +465,26 @@ def find_naked_pairs(row):
 # from any lists that are not the naked pairs themselves 
 
 def naked_pairs_rows(sudoku):
+    sudokucopy = copy.deepcopy(sudoku)
     
-    for row in sudoku:
+    for row in sudokucopy:
         naked_pair = find_naked_pairs(row)
         
         for col in row:
             
-            for x in naked_pair:
-               
-                 if is_list(col):
-                     
-                     if len(col) > 2:
-                    
+            if is_list(naked_pair):
+             
+                for x in naked_pair:
+                   
+                     if is_list(col) and len(col) > 2:
+                        
                          for x in naked_pair:
                             
                              if x in col:
-                                col.remove(x)
-                                
-                     if len(col) == 2:
-                     
+                                col.remove(x)\
+                                    
+                     if is_list(col) and len(col) == 2:
+                         
                          if col[0] not in naked_pair or col[1] not in naked_pair:
                             
                              for x in naked_pair:
@@ -338,7 +492,7 @@ def naked_pairs_rows(sudoku):
                                  if x in col:
                                     col.remove(x)
    
-    return list_to_int(sudoku)  
+    return list_to_int(sudokucopy)   
 
 # We decided to change the sudoku columns and grids to rows so we could use 
 # the same function and then convert them back
@@ -397,10 +551,67 @@ def naked_pairs_elimination(sudoku):
     sudoku4 = naked_pairs_grids(sudoku3)
 
     puzzle_reduced = list_to_int(sudoku4)
+    print('Naked_Pairs_Elimination')
 
     return puzzle_reduced
 
 # NAKED PAIRS END
+
+# BACKTRACKER
+
+def is_sudoku_solved(sudoku):
+    
+    solved = True  # Assume the Sudoku is solved until proven otherwise
+    
+    for row in sudoku:
+        
+        for col in row:
+
+            if is_list(col) or col == 0:
+                solved = False
+
+    return solved
+                
+
+def find_empty_location(sudoku):
+    for i in range(9):
+        for j in range(9):
+            if sudoku[i][j] == 0 or is_list(sudoku[i][j]):
+                return i, j
+    return None
+
+def is_valid_guess(sudoku, row, col, num):
+    for i in range(9):
+        if sudoku[row][i] == num or sudoku[i][col] == num or sudoku[(row // 3) * 3 + i // 3][(col // 3) * 3 + i % 3] == num:
+            return False
+    return True
+
+def backtracker(sudoku):
+    if is_sudoku_solved(sudoku):
+        return sudoku
+
+    empty_location = find_empty_location(sudoku)
+    
+    if empty_location:
+        row, col = empty_location
+
+        for num in sudoku[row][col]:
+           
+            if is_valid_guess(sudoku, row, col, num):
+                sudoku_copy = copy.deepcopy(sudoku)
+                sudoku_copy[row][col] = num
+                
+                result = backtracker(sudoku_copy)  
+                if is_sudoku_solved(result):
+                    for i in range(9):
+                        for j in range(9):
+                            sudoku[i][j] = sudoku_copy[i][j]
+    
+                    return sudoku
+
+    return sudoku
+
+# BACKTRACKER CODE END
 
 # MAIN LOOP CODE
 
@@ -410,23 +621,33 @@ def main_loop(puzzle):
     puzzle = simple_elim(puzzle)
     if not puzzle_copy == puzzle:
         main_loop(puzzle)
+        
     else:
         puzzle_copy = copy.deepcopy(puzzle)
-        puzzle = box_line_reduction(puzzle)
+        hidden_singles_elimination(puzzle)
         if not puzzle_copy == puzzle:
             main_loop(puzzle)
         else:
             puzzle_copy = copy.deepcopy(puzzle)
-            puzzle = pointing_reduction(puzzle)
-
+            naked_pairs_elimination(puzzle) 
             if not puzzle_copy == puzzle:
                 main_loop(puzzle)
-            '''else:
+            else:
                 puzzle_copy = copy.deepcopy(puzzle)
-                naked_pairs_elimination(puzzle)            
+                puzzle = box_line_reduction(puzzle)
                 if not puzzle_copy == puzzle:
                     main_loop(puzzle)
-                else: etcetcetc'''
+                else:
+                    puzzle_copy = copy.deepcopy(puzzle)
+                    puzzle = pointing_reduction(puzzle)
+                    if not puzzle_copy == puzzle:
+                        main_loop(puzzle)
+                    else:
+                        puzzle_copy = copy.deepcopy(puzzle)
+                        backtracker(puzzle) 
+                        if not puzzle_copy == puzzle:
+                            main_loop(puzzle)
+                            '''else: etc'''
                 
     return puzzle
 
@@ -458,8 +679,65 @@ def sudoku_solver(puzzle):
 # MAIN LOOP CODE END
 
 
-# USER INTERFACE CODE
+# TESTING CODE
 
+# This code is purely for testing purposes and is not used at all in the final
+# product.
+
+# When using the testing code please comment out the UI code before using.
+
+# When not using the testing code please comment out like it is now.
+
+'''
+
+def test_loop(puzzle):
+    
+    same = False
+    
+    while same == False:
+        
+        puzzle_copy = copy.deepcopy(puzzle)
+        print(puzzle)
+        puzzle1 = convert_to_listed(puzzle)
+        # INSERT THE FUNCTION YOU WANT TO TEST LOOP BELOW
+        puzzle2 = simple_elim(puzzle1)
+        puzzle3 = pointing_reduction(puzzle2)
+        puzzle4 = box_line_reduction(puzzle3)
+        puzzle5 = hidden_singles_elimination(puzzle4)
+        puzzle6 = naked_pairs_elimination(puzzle5)
+        
+        if puzzle6 == puzzle_copy:
+            same = True
+            
+    return puzzle
+
+# This is a solvable sudoku that can be used for testing purposes
+sudoku =[[4, 0, 0, 0, 0, 0, 9, 3, 8],
+          [0, 3, 2, 0, 9, 4, 1, 0, 0],
+          [0, 9, 5, 3, 0, 0, 2, 4, 0],
+          [3, 7, 0, 6, 0, 9, 0, 0, 4],
+          [5, 2, 9, 0, 0, 1, 6, 7, 3],
+          [6, 0, 4, 7, 0, 3, 0, 9, 0],
+          [9, 5, 7, 0, 0, 8, 3, 0, 0],
+          [0, 0, 3, 9, 0, 0, 4, 0, 0],
+          [2, 4, 0, 0, 3, 0, 7, 0, 9]]
+
+print('This is your inputted sudoku: ')
+for i in range(9):
+    print(sudoku[i])
+    
+puzzle = convert_to_listed(sudoku)
+puzzle_complete = test_loop(puzzle)
+
+print("Here is your solved puzzle: ")
+for i in range(9):
+    print(puzzle_complete[i])
+
+# TESTING CODE END
+
+'''
+
+# USER INTERFACE CODE
 
 print("Enter your sudoku puzzle row by row, with a space between entries. (Write 0 for an empty cell). ")
 sudoku = []
@@ -469,7 +747,6 @@ for i in range(9):
     numbers = b.split(' ')
     row = [int(i) for i in numbers]
     sudoku.append(row)
-
 
 print('This is your inputted sudoku: ')
 for i in range(9):
@@ -489,8 +766,6 @@ else:
         print(puzzle2[i])
 
 # USER INTERFACE CODE END
-
-
 
 
 
