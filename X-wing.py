@@ -1,5 +1,4 @@
 import copy
-from itertools import product
 
 # x-wingable sudoku from https://www.sudokuwiki.org/X_Wing_Strategy
 puzzle = [[1,[3,7,8],[3,7],[2,3,4,7,8],[2,7,8],[2,3,4,7,8],5,6,9],
@@ -11,41 +10,46 @@ puzzle = [[1,[3,7,8],[3,7],[2,3,4,7,8],[2,7,8],[2,3,4,7,8],5,6,9],
           [[3,7,8],4,[3,7],5,[2,7,8,9],[2,3,7,8],[3,7,9],1,6],
           [9,[3,7,8],5,[3,7,8],6,1,4,[3,7,8],2],
           [6,2,1,[3,4,7,8],[7,8,9],[3,4,7,8],[3,7,9],[3,7,8,9],5]]
-
+          
 def find_columns(row, n):
     # returns list of columns of which n is a candidate in a given row
     columns = []
-    for i, cell in enumerate(row):
+    for col, cell in enumerate(row):
         if isinstance(cell, list):
             for value in cell:
                 if value == n:
-                    columns.append(i)
+                    columns.append(col)
     return columns
 
 def two_poss_value_check(row, n):
     # returns true if n is a candidate in exactly 2 cells in a row
     count = 0
     for col in range(9):
-        if isinstance(row[col], list):
-            for n in row[col]:
-                count += 1
+        if not isinstance(row[col], int):
+            for value in row[col]:
+                if value == n:
+                    count += 1
     return count == 2
 
 def find_second_row(sudoku, n, row1, columns):
     # returns a second row in which n is a candidate in the same columns as the first row
     for index, row in enumerate(sudoku):
         # second row must also only have 2 cells being candidates for n
-        if index != row1:
-            if two_poss_value_check(row, n) and find_columns(row, n) == columns:
-                return index
-        
-def find_x_wing(sudoku):
+        if index != row1 and two_poss_value_check(row, n) and find_columns(row, n) == columns:
+            return index
+
+def perform_row_x_wing(sudoku, n, row1, row2, col1, col2):    
+    # removes candidate from cells in each row in given columns except for rows in x-wing
+    for row in sudoku:
+        if row != row1 or row2:
+            if n in row[col1]:
+                row[col1].remove(n)
+                if n in row[col2]:
+                    row[col2].remove(n)
+    return sudoku
+
+def x_wing(sudoku):
     # returns list of candidates and co-ordinates of x-wing
-    candidates = []
-    row1 = []
-    row2 = []
-    col1 = []
-    col2 = []
     for row in sudoku:
         # creates count tally for each value in each row
         value_counts = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0}
@@ -58,53 +62,29 @@ def find_x_wing(sudoku):
             if count == 2:
                 columns = find_columns(row, value)
                 second_row = find_second_row(sudoku, value, row, columns)
-                
-                if second_row is not None:                
-                    candidates.append(value)
-                    row1.append(row)
-                    row2.append(second_row)
-                    col1.append(columns[0])
-                    col2.append(columns[1])
-    return candidates, row1, row2, col1, col2
-                   
-def row_x_wing(sudoku):
-    candidates, row1, row2, col1, col2 = find_x_wing(sudoku)
-    
-    # if no x-wing candidates, returns original sudoku
-    if candidates is None:
-        return sudoku
-    
-    # removes candidate from cells in each row in given columns except for rows in x-wing
-    for n, r1, r2, c1, c2 in product(candidates, row1, row2, col1, col2):
-        for row in sudoku:
-            if row != r1 or row != r2:
-                if n in row[c1]:
-                    row[c1].remove(n)
-                    if n in row[c2]:
-                        row[c2].remove(n)
+                if second_row is not None:   
+                    perform_row_x_wing(sudoku, value, row, second_row, columns[0], columns[1])
+                    x_wing()
     return sudoku
 
 def convert_to_listed(sudoku):
+    # converts 0's to lists 1-9
     for row in sudoku:
         for col in range(9):
             if row[col] == 0:
                 row[col] = list(range(1,10))
-    return sudoku
-
-def is_list(x):
-   if type(x) is list:
-       return True
-   else:
-       return False          
+    return sudoku   
             
 def list_to_int(sudoku):
+    # converts cells with 1 possible candidate to that candidate
     for row in sudoku:
         for col in range(9):
-            if is_list(row[col]) and len(row[col]) == 1:
+            if isinstance(row[col], list) and len(row[col]) == 1:
                 row[col] = row[col][0]
     return sudoku
     
 def column_to_row(list_of_lists):
+    # converts columns to rows
     unlisted = []
     # a list of all the entries in row order unlisted
     for row in range(len(list_of_lists)): 
@@ -118,7 +98,7 @@ def column_to_row(list_of_lists):
                                                                                                           
 def col_x_wing(sudoku):
     # same as row x-wing except with columns and rows switched
-    column_to_row(row_x_wing(column_to_row(sudoku)))
+    column_to_row(x_wing(column_to_row(sudoku)))
     return sudoku
 
 def test_1(sudoku):
@@ -134,7 +114,7 @@ def test_1(sudoku):
 
         # Apply your solving functions repeatedly until no more changes are made
         # convert_to_listed(sudokucopy)
-        row_x_wing(sudokucopy)
+        x_wing(sudokucopy)
         # col_x_wing(sudokucopy)
         # list_to_int(sudokucopy)
         if sudokucopy == previous_state:
