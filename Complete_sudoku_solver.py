@@ -603,10 +603,8 @@ def backtracker(sudoku):
                     for i in range(9):
                         for j in range(9):
                             sudoku[i][j] = sudoku_copy[i][j]
-    
-                    return sudoku
+        return sudoku
 
-    return sudoku
 
 # BACKTRACKER CODE END
 
