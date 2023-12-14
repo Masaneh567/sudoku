@@ -58,3 +58,29 @@ def row_x_wing(sudoku):
                 if second_row is not None:
                     perform_x_wing(sudoku, value, index, second_row, columns[0], columns[1])
     return sudoku
+    
+def list_to_int(sudoku):
+    # converts cells with 1 possible candidate to that candidate
+    for row in sudoku:
+        for col in range(9):
+            if isinstance(row[col], list) and len(row[col]) == 1:
+                row[col] = row[col][0]
+    return sudoku
+    
+def column_to_row(list_of_lists):
+    # converts columns to rows
+    unlisted = []
+    # a list of all the entries in row order unlisted
+    for row in range(len(list_of_lists)): 
+        for col in range(len(list_of_lists)):
+            unlisted.append(list_of_lists[col][row])
+    relisted = []
+    # puts entries into 9 lists of 9
+    for i in range(0, len(unlisted), 9):
+        relisted.append(unlisted[i:i+9])
+    return relisted
+                                                                                                          
+def col_x_wing(sudoku):
+    # same as row x-wing except with columns and rows switched
+    column_to_row(row_x_wing(column_to_row(sudoku)))
+    return sudoku
